@@ -1,7 +1,7 @@
-import keys
+import api_keys
 from openai import OpenAI
 
-client = OpenAI(api_key=keys.get_openai_key())
+client = OpenAI(api_key=api_keys.get_openai_key())
 
 def generate_image(prompt):
   response = client.images.generate(

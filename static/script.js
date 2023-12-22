@@ -1,5 +1,8 @@
+let isLoading = false;
+let loadingElement;
+
 document.addEventListener("DOMContentLoaded", function () {
-  const loadingElement = document.getElementById("loading");
+  loadingElement = document.getElementById("loading"); // Corrected this line
   const loadingTextElement = document.createElement("p"); // Create a new paragraph element for the loading text
   loadingTextElement.style.color = "#fff"; // Set the text color to white
   loadingTextElement.style.fontSize = "1.5em"; // Set the font size
@@ -22,13 +25,14 @@ document.addEventListener("DOMContentLoaded", function () {
   fetch("/game")
     .then((response) => response.json())
     .then((data) => {
-      loadingElement.style.display = "none"; // Hide the loading overlay
       displayStoryAndImages(data.story, data.images, data.imagePrompts);
     })
     .catch((error) => {
       console.error("Error fetching data:", error);
       alert("An error occurred while fetching data. Please try again later.");
       print(error);
+      isLoading = false;
+      loadingElement.style.display = "none"; // Hide loading indicator on error
     });
 });
 
@@ -61,6 +65,8 @@ function displayStoryAndImages(story, images, imagePrompts) {
     );
     imageChoicesContainer.appendChild(img); // Append the image to the container
   });
+  isLoading = false;
+  loadingElement.style.display = "none";
 }
 
 // Ensure the selectImage function is updated accordingly
@@ -70,6 +76,11 @@ function displayStoryAndImages(story, images, imagePrompts) {
 // Ensure the selectImage function is updated accordingly
 
 function selectImage(selectedImageId) {
+  if (isLoading) return; // Prevent selection if already loading
+
+  isLoading = true; // Set loading state
+  loadingElement.style.display = "flex"; // Show loading indicator
+
   const selectedImage = document.getElementById(selectedImageId);
   const selectedPrompt = selectedImage.dataset.prompt;
 
@@ -86,8 +97,17 @@ function selectImage(selectedImageId) {
       // Display the next part of the story and new images
       displayStoryAndImages(data.story, data.images, data.imagePrompts);
     })
-    .catch((error) => console.error("Error:", error));
+    .catch((error) => {
+      console.error("Error:", error);
+      isLoading = false; // Reset loading state on error
+      loadingElement.style.display = "none"; // Hide loading indicator
+    });
+
   const images = document.querySelectorAll(".image-choice");
+  const selectedIndex = Array.from(images).findIndex(
+    (img) => img.id === selectedImageId
+  );
+
   images.forEach((img, index) => {
     if (index === selectedIndex) {
       img.style.border = "3px solid blue"; // Highlight the selected image
