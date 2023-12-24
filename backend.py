@@ -11,6 +11,7 @@ def generate_image(prompt):
     quality="standard",
     n=1,
   )
+  print("Image generated")
   return response
 
 def get_story_and_image_prompts():    

@@ -1,8 +1,10 @@
 let isLoading = false;
 let loadingElement;
+let smallLoadingElement;
 
 document.addEventListener("DOMContentLoaded", function () {
-  loadingElement = document.getElementById("loading"); // Corrected this line
+  loadingElement = document.getElementById("loading");
+  smallLoadingElement = document.getElementById("smallLoading");
   const loadingTextElement = document.createElement("p"); // Create a new paragraph element for the loading text
   loadingTextElement.style.color = "#fff"; // Set the text color to white
   loadingTextElement.style.fontSize = "1.5em"; // Set the font size
@@ -26,13 +28,14 @@ document.addEventListener("DOMContentLoaded", function () {
     .then((response) => response.json())
     .then((data) => {
       displayStoryAndImages(data.story, data.images, data.imagePrompts);
+      loadingElement.style.display = "none"; // Hide the large loading screen after initial load
+      isLoading = false; // Set loading state to false after initial load
     })
     .catch((error) => {
       console.error("Error fetching data:", error);
       alert("An error occurred while fetching data. Please try again later.");
-      print(error);
       isLoading = false;
-      loadingElement.style.display = "none"; // Hide loading indicator on error
+      loadingElement.style.display = "none";
     });
 });
 
@@ -60,13 +63,13 @@ function displayStoryAndImages(story, images, imagePrompts) {
     // Set the prompt for each image
     img.dataset.prompt = imagePrompts[index];
 
-    img.addEventListener("click", () =>
-      selectImage(img.id, img.dataset.prompt)
-    );
+    img.addEventListener("click", () => {
+      if (!isLoading) {
+        selectImage(img.id);
+      }
+    });
     imageChoicesContainer.appendChild(img); // Append the image to the container
   });
-  isLoading = false;
-  loadingElement.style.display = "none";
 }
 
 // Ensure the selectImage function is updated accordingly
@@ -79,10 +82,21 @@ function selectImage(selectedImageId) {
   if (isLoading) return; // Prevent selection if already loading
 
   isLoading = true; // Set loading state
-  loadingElement.style.display = "flex"; // Show loading indicator
+  smallLoadingElement.style.display = "flex"; // Show small loading indicator
 
   const selectedImage = document.getElementById(selectedImageId);
   const selectedPrompt = selectedImage.dataset.prompt;
+
+  // Highlight the selected image
+  const images = document.querySelectorAll(".image-choice");
+  images.forEach((img) => {
+    img.style.border = img.id === selectedImageId ? "3px solid blue" : "none";
+  });
+
+  // Disable further image clicks
+  images.forEach((img) => {
+    img.style.pointerEvents = "none";
+  });
 
   // Send the selected prompt back to the server
   fetch("/game", {
@@ -94,25 +108,19 @@ function selectImage(selectedImageId) {
   })
     .then((response) => response.json())
     .then((data) => {
-      // Display the next part of the story and new images
       displayStoryAndImages(data.story, data.images, data.imagePrompts);
     })
     .catch((error) => {
       console.error("Error:", error);
-      isLoading = false; // Reset loading state on error
-      loadingElement.style.display = "none"; // Hide loading indicator
+      alert("An error occurred. Please try again.");
+    })
+    .finally(() => {
+      isLoading = false; // Reset loading state
+      smallLoadingElement.style.display = "none"; // Hide small loading indicator
+
+      // Re-enable image clicks
+      images.forEach((img) => {
+        img.style.pointerEvents = "auto";
+      });
     });
-
-  const images = document.querySelectorAll(".image-choice");
-  const selectedIndex = Array.from(images).findIndex(
-    (img) => img.id === selectedImageId
-  );
-
-  images.forEach((img, index) => {
-    if (index === selectedIndex) {
-      img.style.border = "3px solid blue"; // Highlight the selected image
-    } else {
-      img.style.border = "none"; // Remove highlight from other images
-    }
-  });
 }
