@@ -5,31 +5,31 @@ let smallLoadingElement;
 document.addEventListener("DOMContentLoaded", function () {
   loadingElement = document.getElementById("loading");
   smallLoadingElement = document.getElementById("smallLoading");
-  const loadingTextElement = document.createElement("p"); // Create a new paragraph element for the loading text
-  loadingTextElement.style.color = "#fff"; // Set the text color to white
-  loadingTextElement.style.fontSize = "1.5em"; // Set the font size
-  loadingTextElement.textContent = "Creating your story..."; // Display the first message straight away
-  loadingElement.appendChild(loadingTextElement); // Add the loading text element to the loading overlay
-  loadingElement.style.display = "flex"; // Show the loading overlay
+  const loadingTextElement = document.createElement("p");
+  loadingTextElement.style.color = "#fff";
+  loadingTextElement.style.fontSize = "1.5em";
+  loadingTextElement.textContent = "Creating your story...";
+  loadingElement.appendChild(loadingTextElement);
+  loadingElement.style.display = "flex";
 
   setTimeout(() => {
-    loadingTextElement.textContent = "Preparing choices..."; // Display the second message after 5 seconds
+    loadingTextElement.textContent = "Preparing choices...";
   }, 3000);
 
   setTimeout(() => {
-    loadingTextElement.textContent = "Creating images..."; // Display the second message after 5 seconds
-  }, 6000);
+    loadingTextElement.textContent = "Creating images...";
+  }, 7000);
 
   setTimeout(() => {
-    loadingTextElement.textContent = "Finalizing..."; // Display the third message after 6 seconds
-  }, 9000);
+    loadingTextElement.textContent = "Finalizing...";
+  }, 10000);
 
   fetch("/game")
     .then((response) => response.json())
     .then((data) => {
       displayStoryAndImages(data.story, data.images, data.imagePrompts);
-      loadingElement.style.display = "none"; // Hide the large loading screen after initial load
-      isLoading = false; // Set loading state to false after initial load
+      loadingElement.style.display = "none";
+      isLoading = false;
     })
     .catch((error) => {
       console.error("Error fetching data:", error);
@@ -42,13 +42,14 @@ document.addEventListener("DOMContentLoaded", function () {
 function displayStoryAndImages(story, images, imagePrompts) {
   // Append the new part of the story
   const storyTextElement = document.getElementById("storyText");
-  const newStoryDiv = document.createElement("div"); // Create a new div for the new story segment
+  const newStoryDiv = document.createElement("div");
+  const formattedStory = story.replace(/\n/g, "<br>"); //Potential cause of error!
   newStoryDiv.innerHTML = `<p>${story}</p>`;
-  storyTextElement.appendChild(newStoryDiv); // Append the new story div to the existing story text
+  storyTextElement.appendChild(newStoryDiv);
 
   // Clear and replace the current images
   const imageChoicesContainer = document.getElementById("imageChoices");
-  imageChoicesContainer.innerHTML = ""; // Clear the container
+  imageChoicesContainer.innerHTML = "";
 
   // Append the new images
   images.forEach((imageUrl, index) => {
@@ -56,9 +57,9 @@ function displayStoryAndImages(story, images, imagePrompts) {
     img.src = imageUrl;
     img.alt = "Generated Image";
     img.id = `image-${Date.now()}-${index}`; // Set a unique ID for each image
-    img.classList.add("image-choice"); // Add a class for styling
-    img.style.width = "200px"; // Set a fixed width
-    img.style.height = "auto"; // Maintain aspect ratio
+    img.classList.add("image-choice");
+    img.style.width = "200px";
+    img.style.height = "auto";
 
     // Set the prompt for each image
     img.dataset.prompt = imagePrompts[index];
@@ -68,21 +69,15 @@ function displayStoryAndImages(story, images, imagePrompts) {
         selectImage(img.id);
       }
     });
-    imageChoicesContainer.appendChild(img); // Append the image to the container
+    imageChoicesContainer.appendChild(img);
   });
 }
 
-// Ensure the selectImage function is updated accordingly
-
-// Ensure the selectImage function is updated accordingly
-
-// Ensure the selectImage function is updated accordingly
-
 function selectImage(selectedImageId) {
-  if (isLoading) return; // Prevent selection if already loading
+  if (isLoading) return; // Prevent selection (again?) if already loading
 
-  isLoading = true; // Set loading state
-  smallLoadingElement.style.display = "flex"; // Show small loading indicator
+  isLoading = true;
+  smallLoadingElement.style.display = "flex";
 
   const selectedImage = document.getElementById(selectedImageId);
   const selectedPrompt = selectedImage.dataset.prompt;
@@ -90,7 +85,8 @@ function selectImage(selectedImageId) {
   // Highlight the selected image
   const images = document.querySelectorAll(".image-choice");
   images.forEach((img) => {
-    img.style.border = img.id === selectedImageId ? "3px solid blue" : "none";
+    img.style.border =
+      img.id === selectedImageId ? "1px dotted lightgray" : "none";
   });
 
   // Disable further image clicks
@@ -115,8 +111,8 @@ function selectImage(selectedImageId) {
       alert("An error occurred. Please try again.");
     })
     .finally(() => {
-      isLoading = false; // Reset loading state
-      smallLoadingElement.style.display = "none"; // Hide small loading indicator
+      isLoading = false;
+      smallLoadingElement.style.display = "none";
 
       // Re-enable image clicks
       images.forEach((img) => {

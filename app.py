@@ -39,7 +39,7 @@ def game():
     return jsonify({
         'story': next_story,
         'images': [image_url_1, image_url_2],
-        'imagePrompts': [next_image_prompt_1, next_image_prompt_2]  # Include image prompts in the response
+        'imagePrompts': [next_image_prompt_1, next_image_prompt_2]
     })
 
 if __name__ == '__main__':
