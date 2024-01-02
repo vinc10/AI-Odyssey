@@ -43,8 +43,8 @@ function displayStoryAndImages(story, images, imagePrompts) {
   // Append the new part of the story
   const storyTextElement = document.getElementById("storyText");
   const newStoryDiv = document.createElement("div");
-  const formattedStory = story.replace(/\n/g, "<br>"); //Potential cause of error!
-  newStoryDiv.innerHTML = `<p>${story}</p>`;
+  const formattedStory = story.replace(/\n/g, "<br>");
+  newStoryDiv.innerHTML = `<p>${formattedStory}</p>`;
   storyTextElement.appendChild(newStoryDiv);
 
   // Clear and replace the current images

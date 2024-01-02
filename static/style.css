@@ -110,3 +110,11 @@ body {
     transform: rotate(360deg);
   }
 }
+
+img {
+  cursor: pointer;
+}
+
+a {
+  color: white;
+}
