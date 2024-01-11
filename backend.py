@@ -45,7 +45,7 @@ def get_story_and_image_prompts():
 def continue_story(previous_story, user_choice):
     system_instruction = ( 
     "You are hosting a text adventure game. "
-    "The user makes their choice by clicking on an image, whcih is the prompt you will see. "
+    "The user makes their choice by clicking on an image, which is the prompt you will see. "
     "Continue the narrative based on the user's last choice. "
     "Keep it very brief to keep the player engaged. "
     "Then, ask the player to make a choice, but don't tell them too much about the choice. "
